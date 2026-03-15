@@ -40,7 +40,6 @@
                     animation: {
                         'fade-in': 'fadeIn 1s ease-out forwards',
                         'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                        'print': 'printOut 3.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
@@ -51,11 +50,6 @@
                         slideUp: {
                             '0%': { opacity: '0', transform: 'translateY(20px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        printOut: {
-                            '0%': { transform: 'translateY(-100%)', opacity: '0.8', boxShadow: 'none' },
-                            '50%': { transform: 'translateY(-30%)', opacity: '0.9', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' },
-                            '100%': { transform: 'translateY(0)', opacity: '1', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' },
                         }
                     }
                 }
@@ -86,7 +80,6 @@
         .flashing { opacity: 1 !important; transition: none !important; }
 
         .polaroid-frame {
-            /* Handled dynamically by canvas now, but we keep a tiny border for the web preview */
             padding: 2px;
             transition: background-color 0.3s ease;
         }
@@ -119,27 +112,23 @@
 
         input::placeholder { color: rgba(255, 255, 255, 0.4); }
 
-        /* Disable horizontal scroll caused by backgrounds */
         html, body { overflow-x: hidden; }
 
-        /* Printer Slot Styling */
-        #printer-slot-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 80px;
-            background: linear-gradient(to bottom, #111 0%, rgba(17,17,17,0.95) 60%, transparent 100%);
-            z-index: 40;
-            pointer-events: none;
-            display: flex;
-            justify-content: center;
-        }
-        #printer-slot-line {
-            width: 600px;
-            max-width: 90%;
-            height: 4px;
-            background: #000;
-            margin-top: 10px;
-            border-radius: 4px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.1);
+        /* Cute Line/Shape Pattern for Result Screen */
+        .bg-cute-pattern {
+            background-color: #fdf3f4; /* maroon-50 */
+            /* Custom diagonal stripe pattern with a cheerful color */
+            background-image: repeating-linear-gradient(
+                45deg,
+                rgba(231, 115, 142, 0.05) 0,           /* maroon-400 */
+                rgba(231, 115, 142, 0.05) 10px,
+                transparent 10px,
+                transparent 30px,
+                rgba(191, 44, 75, 0.03) 30px,           /* maroon-600 */
+                rgba(191, 44, 75, 0.03) 40px,
+                transparent 40px,
+                transparent 60px
+            );
         }
 
     </style>
@@ -201,26 +190,22 @@
                     
                     <div class="flex-1 flex flex-col gap-6 md:gap-8 overflow-y-auto pr-1 md:pr-2 pb-6">
                         
-                        <!-- Format / Layout (Horizontal on Mobile) -->
+                        <!-- Format / Layout -->
                         <div>
                             <p class="text-xs md:text-sm font-medium mb-2 md:mb-3 text-gray-200">1. Select Layout</p>
                             <div class="flex flex-row lg:grid lg:grid-cols-4 gap-2 overflow-x-auto snap-x pb-2">
-                                <!-- Single -->
                                 <button data-layout="single" class="layout-btn snap-start selected border border-white/20 hover:border-white/50 rounded-sm p-3 flex flex-col items-center gap-2 transition-all">
                                     <div class="w-8 h-10 bg-white/10 border border-white/30 flex items-center justify-center p-1"><div class="w-full h-full bg-white/20"></div></div>
                                     <span class="text-[9px] uppercase tracking-wider text-gray-300 font-medium">Single</span>
                                 </button>
-                                <!-- Strip (1x3) -->
                                 <button data-layout="strip_3" class="layout-btn snap-start border border-white/20 hover:border-white/50 rounded-sm p-3 flex flex-col items-center gap-2 transition-all">
                                     <div class="w-6 h-12 bg-white/10 border border-white/30 p-0.5 flex flex-col gap-0.5"><div class="w-full h-full bg-white/20"></div><div class="w-full h-full bg-white/20"></div><div class="w-full h-full bg-white/20"></div></div>
                                     <span class="text-[9px] uppercase tracking-wider text-gray-300 font-medium">1x3 Strip</span>
                                 </button>
-                                <!-- Strip (1x4) -->
                                 <button data-layout="strip_4" class="layout-btn snap-start border border-white/20 hover:border-white/50 rounded-sm p-3 flex flex-col items-center gap-2 transition-all">
                                     <div class="w-5 h-12 bg-white/10 border border-white/30 p-0.5 flex flex-col gap-[1px]"><div class="w-full h-full bg-white/20"></div><div class="w-full h-full bg-white/20"></div><div class="w-full h-full bg-white/20"></div><div class="w-full h-full bg-white/20"></div></div>
                                     <span class="text-[9px] uppercase tracking-wider text-gray-300 font-medium">1x4 Strip</span>
                                 </button>
-                                <!-- Grid (2x2) -->
                                 <button data-layout="grid" class="layout-btn snap-start border border-white/20 hover:border-white/50 rounded-sm p-3 flex flex-col items-center gap-2 transition-all">
                                     <div class="w-10 h-10 bg-white/10 border border-white/30 p-0.5 grid grid-cols-2 gap-0.5"><div class="bg-white/20"></div><div class="bg-white/20"></div><div class="bg-white/20"></div><div class="bg-white/20"></div></div>
                                     <span class="text-[9px] uppercase tracking-wider text-gray-300 font-medium">2x2 Grid</span>
@@ -238,7 +223,7 @@
                             </div>
                         </div>
 
-                        <!-- Filters (Horizontal on Mobile) -->
+                        <!-- Filters -->
                         <div>
                             <p class="text-xs md:text-sm font-medium mb-2 md:mb-3 text-gray-200">3. Artistic Filter</p>
                             <div class="flex flex-row lg:grid lg:grid-cols-4 gap-3 overflow-x-auto snap-x pb-2">
@@ -277,7 +262,7 @@
                             </div>
                         </div>
 
-                        <!-- Frame Color (Horizontal on Mobile) -->
+                        <!-- Frame Color -->
                         <div>
                             <p class="text-xs md:text-sm font-medium mb-2 md:mb-3 text-gray-200">4. Frame Background</p>
                             <div class="flex flex-row flex-wrap lg:flex-wrap gap-3 overflow-x-auto pb-2">
@@ -345,20 +330,15 @@
     </main>
 
     <!-- ==================== SCREEN 3: PROCESSING & RESULT ==================== -->
-    <main id="screen-result" class="screen flex-col items-center justify-start min-h-screen w-full px-4 md:px-8 py-12 md:py-20 bg-[#f8f8f8] z-10 relative overflow-hidden">
-        
-        <!-- Animated Printer Slot Element -->
-        <div id="printer-slot-overlay">
-            <div id="printer-slot-line"></div>
-        </div>
+    <main id="screen-result" class="screen flex-col items-center justify-start min-h-screen w-full px-4 md:px-8 py-12 md:py-20 bg-cute-pattern z-10 relative overflow-hidden">
         
         <div class="w-full max-w-5xl mx-auto flex flex-col items-center h-full relative z-30 pt-4">
             
             <h2 id="result-title" class="text-2xl md:text-4xl lg:text-5xl font-serif text-maroon-950 mb-8 md:mb-12 tracking-wide text-center drop-shadow-sm">Developing layout...</h2>
 
-            <!-- Result Wrapper (This is what animates OUT of the top slot) -->
+            <!-- Result Wrapper (Fades in now instead of sliding out of a slot) -->
             <div class="relative w-full flex justify-center perspective-[1000px]">
-                <div id="polaroid-wrapper" class="relative shadow-2xl transition-all duration-500 z-10 opacity-0 translate-y-[-100%]">
+                <div id="polaroid-wrapper" class="relative shadow-2xl transition-all duration-700 z-10 opacity-0 scale-95">
                     <div id="polaroid-container" class="polaroid-frame bg-white rounded-sm">
                         <img id="result-img" class="block w-full h-auto object-contain transition-opacity duration-1000" src="" alt="Captured layout" />
                     </div>
@@ -367,10 +347,10 @@
 
             <!-- Result Actions -->
             <div id="result-actions" class="mt-12 md:mt-16 flex flex-col sm:flex-row gap-3 sm:gap-6 opacity-0 transition-opacity duration-1000 w-full max-w-lg justify-center z-40">
-                <button id="btn-retake" class="w-full sm:w-auto px-8 md:px-10 py-3 md:py-4 bg-transparent border border-maroon-800 text-maroon-800 hover:bg-maroon-50 transition-colors uppercase tracking-widest text-[10px] md:text-xs font-semibold rounded-sm">
+                <button id="btn-retake" class="w-full sm:w-auto px-8 md:px-10 py-3 md:py-4 bg-white border border-maroon-800 text-maroon-800 hover:bg-maroon-50 shadow-md transition-colors uppercase tracking-widest text-[10px] md:text-xs font-semibold rounded-sm">
                     Start Over
                 </button>
-                <button id="btn-download" class="w-full sm:w-auto px-8 md:px-10 py-3 md:py-4 bg-maroon-900 text-white hover:bg-maroon-950 shadow-lg hover:shadow-xl transition-all uppercase tracking-widest text-[10px] md:text-xs font-semibold rounded-sm flex items-center justify-center gap-3">
+                <button id="btn-download" class="w-full sm:w-auto px-8 md:px-10 py-3 md:py-4 bg-maroon-900 text-white hover:bg-maroon-950 shadow-[0_4px_14px_0_rgba(133,29,52,0.39)] hover:shadow-[0_6px_20px_rgba(133,29,52,0.23)] hover:-translate-y-1 transition-all uppercase tracking-widest text-[10px] md:text-xs font-semibold rounded-sm flex items-center justify-center gap-3">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Download Memory
                 </button>
@@ -398,7 +378,10 @@
                 captionText: '',
                 capturedPhotos: [],
                 finalImageDataUrl: null,
-                totalNeeded: 1
+                totalNeeded: 1,
+                // Add capture dimensions to state
+                captureWidth: 1200, 
+                captureHeight: 900
             };
 
             const screens = {
@@ -443,15 +426,14 @@
                     if(state.layout === 'grid') state.totalNeeded = 4;
                     
                     shotsPreview.innerText = state.totalNeeded;
-
-                    // Update viewfinder shape
+                    // Reset Viewfinder ratio visually (but actual canvas capture depends on stream true size)
                     const vf = document.getElementById('viewfinder-container');
                     vf.classList.remove('aspect-[4/3]', 'aspect-[3/4]', 'aspect-[1/1]', 'aspect-[9/16]');
                     
                     if(state.layout === 'grid') vf.classList.add('aspect-[1/1]');
                     else if(state.layout === 'strip_3') vf.classList.add('aspect-[3/4]');
                     else if(state.layout === 'strip_4') vf.classList.add('aspect-[9/16]');
-                    else vf.classList.add('aspect-[4/3]'); // single
+                    else vf.classList.add('aspect-[4/3]'); 
                 });
             });
 
@@ -484,14 +466,12 @@
                     const vf = document.getElementById('viewfinder-container');
                     vf.style.backgroundColor = state.color;
                     
-                    // Contrast logic for branding text
                     const brand = document.getElementById('viewfinder-brand');
                     const isLight = ['#ffffff', '#fdf3f4', '#f4e7d3'].includes(state.color.toLowerCase());
                     brand.style.color = isLight ? '#666' : '#bbb';
                 });
             });
 
-            // Navigation
             function switchScreen(screenKey) {
                 Object.values(screens).forEach(s => s.classList.remove('active'));
                 
@@ -501,7 +481,7 @@
                     darkBg.classList.add('hidden');
                 }
 
-                setTimeout(() => screens[screenKey].classList.add('active'), 10); // mobile rapid switch
+                setTimeout(() => screens[screenKey].classList.add('active'), 10); 
             }
 
             document.getElementById('btn-enter').addEventListener('click', async () => {
@@ -529,6 +509,10 @@
                         camStatus.classList.add('opacity-0');
                         setTimeout(() => camStatus.classList.add('hidden'), 300);
                         btnSnap.disabled = false;
+                        
+                        // Dynamically save the actual camera resolution limits
+                        state.captureWidth = video.videoWidth;
+                        state.captureHeight = video.videoHeight;
                     };
                 } catch (err) {
                     console.error("Camera error:", err);
@@ -567,7 +551,6 @@
             });
 
             function startCaptureLoop(currentPhotoNum) {
-                // Ensure viewport scrolls to top on mobile so they see viewfinder
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 
                 countdownOverlay.classList.remove('hidden');
@@ -603,21 +586,10 @@
                 }
 
                 const tmpCanvas = document.createElement('canvas');
-                tmpCanvas.width = 1200;
-                tmpCanvas.height = 900; 
+                // Use exact sensor resolution -> no cropping
+                tmpCanvas.width = state.captureWidth; 
+                tmpCanvas.height = state.captureHeight;
                 const tCtx = tmpCanvas.getContext('2d');
-
-                const vRatio = video.videoWidth / video.videoHeight;
-                const cRatio = tmpCanvas.width / tmpCanvas.height;
-                let dW = tmpCanvas.width, dH = tmpCanvas.height, oX = 0, oY = 0;
-
-                if (vRatio > cRatio) {
-                    dH = tmpCanvas.height; dW = video.videoWidth * (tmpCanvas.height / video.videoHeight);
-                    oX = -(dW - tmpCanvas.width) / 2;
-                } else {
-                    dW = tmpCanvas.width; dH = video.videoHeight * (tmpCanvas.width / video.videoWidth);
-                    oY = -(dH - tmpCanvas.height) / 2;
-                }
 
                 tCtx.save();
                 tCtx.translate(tmpCanvas.width, 0);
@@ -633,7 +605,7 @@
                 if(state.filter === 'faded') filterStr = 'contrast(0.8) saturate(0.6) brightness(1.1)';
                 tCtx.filter = filterStr;
 
-                tCtx.drawImage(video, oX, oY, dW, dH);
+                tCtx.drawImage(video, 0, 0, tmpCanvas.width, tmpCanvas.height);
                 tCtx.restore();
 
                 state.capturedPhotos.push(tmpCanvas.toDataURL('image/jpeg', 0.95));
@@ -664,23 +636,32 @@
                 const margin = 50; 
                 const imageSpacing = 30;
                 let cWidth = 1200;
-                let cHeight = 1200; // BASE HEIGHT REDUCED DRASTICALLY 
+                let cHeight = 1200; 
 
-                // Shape definitions with TIGHTER BOTTOM GAPS
-                // The branding takes about ~160px height.
+                // Dynamic calculations based on capture aspect ratio
+                // Since tmpCanvas is exactly state.captureWidth/Height, we use that directly.
+                const imgAspect = state.captureWidth / state.captureHeight;
+
                 if (state.layout === 'single') {
                     cWidth = 1200;
-                    cHeight = margin + (900) + 180; // IMG + Padding Base
+                    const iW = cWidth - (margin*2);
+                    const iH = iW / imgAspect; // Height is determined by sensor aspect
+                    cHeight = margin + iH + 180; 
                 } else if (state.layout === 'strip_3') {
                     cWidth = 600;
-                    cHeight = margin + (3 * 375) + (2 * imageSpacing) + 160; 
+                    const iW = cWidth - (margin*2);
+                    const iH = iW / imgAspect;
+                    cHeight = margin + (3 * iH) + (2 * imageSpacing) + 160; 
                 } else if (state.layout === 'strip_4') {
                     cWidth = 600;
-                    cHeight = margin + (4 * 375) + (3 * imageSpacing) + 160;
+                    const iW = cWidth - (margin*2);
+                    const iH = iW / imgAspect;
+                    cHeight = margin + (4 * iH) + (3 * imageSpacing) + 160;
                 } else if (state.layout === 'grid') {
                     cWidth = 1200;
-                    const h = ((1200 - (margin*2) - imageSpacing) / 2) * (3/4); // 480 * 0.75 = 382
-                    cHeight = margin + (2 * h) + imageSpacing + 170;
+                    const iW = (cWidth - (margin*2) - imageSpacing) / 2;
+                    const iH = iW / imgAspect;
+                    cHeight = margin + (2 * iH) + imageSpacing + 170;
                 }
 
                 c.width = cWidth;
@@ -699,24 +680,24 @@
                         imgObjects[idx] = img;
                         loadedCount++;
                         if(loadedCount === state.totalNeeded) {
-                            renderImagesOntoCanvas(c, ctx, imgObjects, cWidth, cHeight, margin, imageSpacing);
+                            renderImagesOntoCanvas(c, ctx, imgObjects, cWidth, cHeight, margin, imageSpacing, imgAspect);
                         }
                     };
                     img.src = src;
                 });
             }
 
-            function renderImagesOntoCanvas(c, ctx, imgs, cWidth, cHeight, m, sp) {
+            function renderImagesOntoCanvas(c, ctx, imgs, cWidth, cHeight, m, sp, imgAspect) {
 
                 if (state.layout === 'single') {
                     const iW = cWidth - (m*2);
-                    const iH = iW * (3/4); 
+                    const iH = iW / imgAspect; 
                     ctx.drawImage(imgs[0], m, m, iW, iH);
                     drawBranding(ctx, cWidth, cHeight, state.color, false);
 
                 } else if (state.layout === 'strip_3' || state.layout === 'strip_4') {
                     const iW = cWidth - (m*2);
-                    const iH = iW * (3/4);
+                    const iH = iW / imgAspect;
                     imgs.forEach((img, idx) => {
                         ctx.drawImage(img, m, m + (idx * (iH + sp)), iW, iH);
                     });
@@ -724,7 +705,7 @@
 
                 } else if (state.layout === 'grid') {
                     const iW = (cWidth - (m*2) - sp) / 2;
-                    const iH = iW * (3/4);
+                    const iH = iW / imgAspect;
                     ctx.drawImage(imgs[0], m, m, iW, iH);
                     ctx.drawImage(imgs[1], m + iW + sp, m, iW, iH);
                     ctx.drawImage(imgs[2], m, m + iH + sp, iW, iH);
@@ -738,14 +719,14 @@
                 if (state.layout === 'strip_3') polaroidWrapper.style.width = '240px';
                 else if (state.layout === 'strip_4') polaroidWrapper.style.width = '200px';
                 else if (state.layout === 'grid') polaroidWrapper.style.width = '380px';
-                else polaroidWrapper.style.width = '400px'; // single
+                else polaroidWrapper.style.width = '420px'; // single
                 
                 polaroidWrapper.style.maxWidth = '90%';
 
                 showResultScreen();
             }
 
-            // BRANDING DRAW (New Reversed Order & Tighter Spacing)
+            // BRANDING DRAW
             function drawBranding(ctx, cW, cH, frameColor, isStrip = false) {
                 ctx.save();
                 
@@ -753,20 +734,16 @@
                 ctx.fillStyle = isLightBg ? '#2b060e' : '#ffffff';
                 ctx.textAlign = 'center';
                 
-                // Base Y anchor based on the tightly cropped canvas height
                 const yAnchor = cH - (isStrip ? 40 : 50); 
                 
-                // 1. Optional Custom Text (TOP)
                 if (state.captionText && state.captionText.length > 0) {
                     ctx.font = `italic ${isStrip ? '16px' : '22px'} 'Playfair Display', serif`;
                     ctx.fillText(state.captionText, cW/2, yAnchor - (isStrip ? 55 : 75));
                 }
                 
-                // 2. Main Signature (MIDDLE)
                 ctx.font = `${isStrip ? '36px' : '65px'} 'Mea Culpa', cursive`;
                 ctx.fillText("Anak Kecik", cW/2, yAnchor - (isStrip ? 15 : 25));
                 
-                // 3. Date (BOTTOM)
                 ctx.font = `italic ${isStrip ? '10px' : '14px'} 'Inter', sans-serif`;
                 ctx.globalAlpha = 0.5;
                 const today = new Date();
@@ -779,10 +756,9 @@
             function showResultScreen() {
                 switchScreen('result');
                 
-                // Reset Anim
-                polaroidWrapper.classList.remove('animate-print');
-                polaroidWrapper.style.transform = 'translateY(-100%)';
-                polaroidWrapper.style.opacity = '0';
+                // Reset Fade In Anim
+                polaroidWrapper.classList.remove('opacity-100', 'scale-100');
+                polaroidWrapper.classList.add('opacity-0', 'scale-95');
                 
                 resultTitle.innerText = "Developing layout...";
                 resultTitle.style.opacity = '1';
@@ -791,22 +767,22 @@
                 
                 polaroidContainer.style.backgroundColor = state.color;
                 resultImg.src = state.finalImageDataUrl;
-                resultImg.style.opacity = '0'; // image fades in slightly as it "develops"
+                resultImg.style.opacity = '0'; 
                 
-                // Start physical movement
-                void polaroidWrapper.offsetWidth; 
-                polaroidWrapper.classList.add('animate-print');
-
-                setTimeout(() => {
-                    // photo fades in while sliding
-                    resultImg.style.opacity = '1';
-                    
+                // Allow browser to render then trigger fade in
+                requestAnimationFrame(() => {
                     setTimeout(() => {
-                        resultTitle.innerText = "Ready to keep.";
-                        resultActions.style.opacity = '1';
-                        resultActions.classList.remove('pointer-events-none');
-                    }, 2500); 
-                }, 500);
+                        polaroidWrapper.classList.remove('opacity-0', 'scale-95');
+                        polaroidWrapper.classList.add('opacity-100', 'scale-100');
+                        resultImg.style.opacity = '1';
+                        
+                        setTimeout(() => {
+                            resultTitle.innerText = "Ready to keep.";
+                            resultActions.style.opacity = '1';
+                            resultActions.classList.remove('pointer-events-none');
+                        }, 2500); 
+                    }, 50);
+                });
             }
 
             // --- RESULT ACTIONS ---
